@@ -1,0 +1,377 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  color-scheme: dark;
+  --safe-top: env(safe-area-inset-top);
+  --safe-bottom: env(safe-area-inset-bottom);
+  --safe-left: env(safe-area-inset-left);
+  --safe-right: env(safe-area-inset-right);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background: #0c1124;
+  overscroll-behavior: none;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+/* ==========================================================================
+   Scene background — only the artwork PNG plus a soft readable zone.
+   Old CSS-drawn moon, vaults, columns, mists, lenses, arcs, observatory and
+   star-map placeholders have been removed; the asset already contains them.
+   ========================================================================== */
+
+.thought-field {
+  background: #0c1124;
+}
+
+.thought-field__play-area {
+  position: absolute;
+  pointer-events: none;
+  top: calc(env(safe-area-inset-top) + 4.6rem);
+  bottom: calc(env(safe-area-inset-bottom) + 14.2rem);
+  left: 0;
+  right: 0;
+}
+
+.thought-field__play-area > * {
+  pointer-events: auto;
+}
+
+@media (min-width: 768px) {
+  .thought-field__play-area {
+    top: calc(env(safe-area-inset-top) + 5rem);
+    bottom: calc(env(safe-area-inset-bottom) + 14.6rem);
+  }
+}
+
+@media (min-width: 1024px) {
+  .thought-field__play-area {
+    top: 5.6rem;
+    bottom: 15rem;
+    left: max(2rem, calc((100vw - 1280px) / 2));
+    right: max(2rem, calc((100vw - 1280px) / 2));
+  }
+}
+
+.scene-bg__base {
+  position: absolute;
+  inset: 0;
+  background: #0c1124;
+}
+
+.scene-bg__art {
+  position: absolute;
+  inset: 0;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+/* Subtle vignette around the play area so text reads cleanly without dulling
+   the artwork. Top and bottom get a stronger fade where the HUD/dock sit. */
+.scene-bg__readable-zone {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(72% 56% at 50% 50%, rgba(10, 14, 26, 0) 0%, rgba(10, 14, 26, 0.16) 62%, rgba(10, 14, 26, 0.42) 100%),
+    linear-gradient(180deg, rgba(10, 14, 26, 0.22) 0%, rgba(10, 14, 26, 0) 24%, rgba(10, 14, 26, 0) 74%, rgba(10, 14, 26, 0.36) 100%);
+}
+
+.scene-bg__particle {
+  position: absolute;
+  border-radius: 999px;
+  background: rgba(229, 231, 238, 0.55);
+  box-shadow: 0 0 12px rgba(229, 231, 238, 0.4);
+  opacity: 0.32;
+  pointer-events: none;
+}
+
+.scene-bg__particle--animated {
+  animation-name: sceneParticleFloat;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+@keyframes sceneParticleFloat {
+  0%,
+  100% {
+    transform: translate(0, 0);
+    opacity: 0.22;
+  }
+  50% {
+    transform: translate(-4px, -10px);
+    opacity: 0.6;
+  }
+}
+
+/* ==========================================================================
+   Thought bubble — the PNG asset IS the bubble surface.
+   No fake CSS pill, no border, no border-radius cloud-shape, no inset glow,
+   no backdrop-filter, no bump/rim/trail/fog scaffolding. Text sits on top.
+   ========================================================================== */
+
+.thought-bubble {
+  position: absolute;
+  width: clamp(170px, 24vw, 260px);
+  aspect-ratio: 1.2 / 1;
+  transform: translate(-50%, -50%);
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 14px 22px rgba(8, 11, 22, 0.36));
+  transition: transform 220ms ease, filter 220ms ease;
+  will-change: transform, opacity, filter;
+}
+
+.thought-bubble:hover {
+  transform: translate(-50%, -50%) scale(1.03);
+  filter: drop-shadow(0 16px 26px rgba(8, 11, 22, 0.42));
+}
+
+/* Optional subtle category-tinted halo behind the PNG. Kept very light so it
+   does not muddy the bubble artwork. */
+.thought-bubble::before {
+  content: "";
+  position: absolute;
+  inset: 6%;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--bubble-tint, rgba(229, 231, 238, 0.16)), transparent 70%);
+  filter: blur(18px);
+  opacity: 0.55;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.thought-bubble__art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  user-select: none;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.thought-bubble__text {
+  position: relative;
+  z-index: 2;
+  display: block;
+  max-width: 74%;
+  padding: 0 0.4rem;
+  text-align: center;
+  color: #f4f6fb;
+  font-size: clamp(0.9rem, 1.05vw, 1.05rem);
+  font-weight: 600;
+  line-height: 1.22;
+  text-shadow:
+    0 1px 4px rgba(8, 11, 22, 0.7),
+    0 0 14px rgba(8, 11, 22, 0.45);
+}
+
+.thought-bubble--animated.thought-bubble--idle {
+  animation: thoughtDrift var(--cycle-seconds, 20s) ease-in-out var(--drift-delay, 0s) infinite;
+}
+
+.thought-bubble--spawn {
+  opacity: 0;
+  animation: thoughtSpawn 520ms cubic-bezier(0.2, 0.9, 0.2, 1) forwards;
+}
+
+.thought-bubble--spawn .thought-bubble__text {
+  opacity: 0;
+  animation: thoughtTextReveal 280ms ease-out 200ms forwards;
+}
+
+.thought-bubble--caught {
+  animation: thoughtCatchArc 480ms cubic-bezier(0.25, 0.85, 0.2, 1) forwards;
+}
+
+.thought-bubble--escape {
+  animation: thoughtDissolve 480ms ease-in forwards;
+}
+
+@keyframes thoughtSpawn {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.82);
+    filter: drop-shadow(0 14px 22px rgba(8, 11, 22, 0.36)) blur(8px);
+  }
+  70% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.04);
+    filter: drop-shadow(0 14px 22px rgba(8, 11, 22, 0.36)) blur(1px);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+    filter: drop-shadow(0 14px 22px rgba(8, 11, 22, 0.36));
+  }
+}
+
+@keyframes thoughtTextReveal {
+  0% {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes thoughtDrift {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) translate(0, 0) rotate(0deg);
+  }
+  18% {
+    transform: translate(-50%, -50%)
+      translate(calc(var(--drift-x) * 0.25), calc(var(--drift-y) * 0.42 - var(--float-amplitude) * 0.24))
+      rotate(calc(var(--rotate-deg) * 0.22));
+  }
+  36% {
+    transform: translate(-50%, -50%)
+      translate(calc(var(--drift-x) * 0.74), calc(var(--drift-y) * 0.15 - var(--float-amplitude) * 0.55))
+      rotate(calc(var(--rotate-deg) * 0.72));
+  }
+  58% {
+    transform: translate(-50%, -50%)
+      translate(var(--drift-x), calc(var(--drift-y) - var(--float-amplitude))) rotate(var(--rotate-deg));
+  }
+  78% {
+    transform: translate(-50%, -50%)
+      translate(calc(var(--drift-x) * -0.38), calc(var(--drift-y) * 0.48 + var(--float-amplitude) * 0.2))
+      rotate(calc(var(--rotate-deg) * -0.32));
+  }
+}
+
+@keyframes thoughtCatchArc {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  60% {
+    opacity: 0.8;
+    transform: translate(-50%, -50%) translate(20px, 84px) scale(0.86) rotate(7deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) translate(6px, 188px) scale(0.66) rotate(12deg);
+    filter: drop-shadow(0 14px 22px rgba(8, 11, 22, 0.36)) blur(4px);
+  }
+}
+
+@keyframes thoughtDissolve {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) translate(0, -10px) scale(1.18);
+    filter: drop-shadow(0 14px 22px rgba(8, 11, 22, 0.36)) blur(10px);
+  }
+}
+
+/* ==========================================================================
+   NPC Cloud Moth — clean transparent in-world sprite.
+   No round wrapper, no halo disc, no mask, no badge, no mix-blend-mode,
+   no fake dust particles. The PNG already has the form.
+   ========================================================================== */
+
+.npc-cloud-moth {
+  position: absolute;
+  right: 5%;
+  top: 5%;
+  width: clamp(96px, 14vw, 168px);
+  height: auto;
+  pointer-events: none;
+  user-select: none;
+  z-index: 4;
+  filter: drop-shadow(0 12px 22px rgba(8, 11, 22, 0.32));
+  transform-origin: 50% 60%;
+  transition: top 900ms ease, right 900ms ease, opacity 300ms ease;
+}
+
+@media (min-width: 768px) {
+  .npc-cloud-moth {
+    right: 6%;
+    top: 6%;
+  }
+}
+
+@media (min-width: 1024px) {
+  .npc-cloud-moth {
+    right: 4%;
+    top: 8%;
+  }
+}
+
+.npc-cloud-moth--curious {
+  top: 10%;
+}
+
+@media (min-width: 1024px) {
+  .npc-cloud-moth--curious {
+    top: 12%;
+  }
+}
+
+.npc-cloud-moth--animated {
+  animation: npcFloat 8.4s ease-in-out infinite;
+}
+
+.npc-cloud-moth--combo {
+  animation: npcFloat 8.4s ease-in-out infinite, npcComboGlow 1100ms ease-out;
+}
+
+@keyframes npcFloat {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  40% {
+    transform: translate3d(-4px, -10px, 0);
+  }
+  70% {
+    transform: translate3d(3px, -4px, 0);
+  }
+}
+
+@keyframes npcComboGlow {
+  0% {
+    filter: drop-shadow(0 12px 22px rgba(8, 11, 22, 0.32));
+  }
+  50% {
+    filter: drop-shadow(0 12px 22px rgba(8, 11, 22, 0.32))
+      drop-shadow(0 0 22px rgba(216, 200, 168, 0.55));
+  }
+  100% {
+    filter: drop-shadow(0 12px 22px rgba(8, 11, 22, 0.32));
+  }
+}

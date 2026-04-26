@@ -1,0 +1,11 @@
+{
+  "name": "Потерянные мысли",
+  "short_name": "Мысли",
+  "description": "Короткая mobile-first игра про ловлю и сортировку мыслей.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#1a1c24",
+  "theme_color": "#1a1c24",
+  "lang": "ru"
+}
